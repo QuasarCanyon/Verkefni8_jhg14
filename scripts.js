@@ -24,7 +24,7 @@ const text = (() => {
     }
 
     for (let i = 0; i < itemButton.length; i++) {
-      itemButton[i].addEventListener('push', deleteItem);
+      itemButton[i].addEventListener('click', deleteItem);
     }
 
     for (let i = 0; i < itemText.length; i++) {
@@ -35,7 +35,7 @@ const text = (() => {
   function formHandler(e) {
     e.preventDefault();
     
-    console.log('halló heimur');
+    // console.log('halló heimur');
   }
 
   // event handler fyrir það að klára færslu
@@ -55,14 +55,33 @@ const text = (() => {
 
   // fall sem sér um að bæta við nýju item
   function add(value) {
+    const li = el('li', 'item');
+    const checkbox = el('checkbox', 'item__checkbox', finish);
+    const span = el('span', 'item__text', edit);
+    const button = el('button', 'item__button', deleteItem);
+
+    span.appendChild(document.createTextNode(value));
+    button.appendChild(document.createTextNode('Eyða'));
+
+    li.appendChild(checkbox);
+    li.appendChild(span);
+    li.appendChild(button);
   }
 
   // event handler til að eyða færslu
   function deleteItem(e) {
+    const del = e.srcElement.parentElement;
+    del.remove();
   }
 
   // hjálparfall til að útbúa element
   function el(type, className, clickHandler) {
+    const newEl = document.createElement(type);
+
+    newEl.setAttribute('class', className);
+    newEl.addEventListener('click', clickHandler);
+
+    return newEl;
   }
 
   return {
