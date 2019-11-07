@@ -34,8 +34,9 @@ const text = (() => {
 
   function formHandler(e) {
     e.preventDefault();
-    
-    // console.log('halló heimur');
+    const data = e.target[0].value;
+    e.target[0].value = '';
+    add(data);
   }
 
   // event handler fyrir það að klára færslu
@@ -46,11 +47,28 @@ const text = (() => {
 
   // event handler fyrir það að breyta færslu
   function edit(e) {
-    
+    const source = e.srcElement.innerText;
+    const parent = e.srcElement.parentElement;
+    e.srcElement.remove();
+    const tempInput = el('input', 'item__edit', commit);
+    tempInput.setAttribute('value', source);
+    const last = parent.querySelector('button');
+    parent.insertBefore(tempInput, last);
+    tempInput.focus();
+    tempInput.setSelectionRange(source.length, source.length);
   }
 
   // event handler fyrir það að klára að breyta færslu
   function commit(e) {
+    if (e.keyCode === ENTER_KEYCODE) {
+      const source = e.target.value;
+      const parent = e.srcElement.parentElement;
+      e.srcElement.remove();
+      const newText = el('span', 'item__text', edit);
+      newText.appendChild(document.createTextNode(source));
+      const last = parent.querySelector('button');
+      parent.insertBefore(newText, last);
+    }
   }
 
   // fall sem sér um að bæta við nýju item
@@ -59,6 +77,7 @@ const text = (() => {
     const checkbox = el('checkbox', 'item__checkbox', finish);
     const span = el('span', 'item__text', edit);
     const button = el('button', 'item__button', deleteItem);
+    const ul = document.querySelector('.items');
 
     span.appendChild(document.createTextNode(value));
     button.appendChild(document.createTextNode('Eyða'));
@@ -66,6 +85,8 @@ const text = (() => {
     li.appendChild(checkbox);
     li.appendChild(span);
     li.appendChild(button);
+
+    ul.appendChild(li);
   }
 
   // event handler til að eyða færslu
@@ -76,10 +97,21 @@ const text = (() => {
 
   // hjálparfall til að útbúa element
   function el(type, className, clickHandler) {
-    const newEl = document.createElement(type);
-
+    let newEl = null;
+    if (type === 'checkbox') {
+      newEl = document.createElement('input');
+      newEl.setAttribute('type', type);
+    } else {
+      newEl = document.createElement(type);
+    }
+    
     newEl.setAttribute('class', className);
-    newEl.addEventListener('click', clickHandler);
+
+    if (clickHandler === commit) {
+      newEl.addEventListener('keydown', clickHandler);
+    } else {
+      newEl.addEventListener('click', clickHandler);
+    }
 
     return newEl;
   }
